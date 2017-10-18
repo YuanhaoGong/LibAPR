@@ -85,18 +85,20 @@ int main(int argc, char **argv) {
                 get_apr(input_image,part_rep,pc_struct,analysis_data);
 
                 pc_struct.name = image_name;
+                pc_struct.pars.name = image_name;
+
+                pc_struct.pars = part_rep.pars;
 
                 produce_apr_analysis(input_image, analysis_data, pc_struct, part_rep.pars);
-
 
                 Mesh_data<uint16_t> interp_img;
                 // save pc reconstruction
                 pc_struct.interp_parts_to_pc(interp_img,pc_struct.part_data.particle_data);
-                write_image_tiff(input_image, path_image  + image_name + ".tif");
+                write_image_tiff(interp_img, path_image  + "Recon/" + image_name + ".tif");
                 // save APR
                 write_apr_pc_struct(pc_struct,path_parts,image_name);
                 // save APR Full
-                write_apr_full_format(pc_struct,path_parts ,image_name);
+                write_apr_full_format(pc_struct,path_parts + "Full/" ,image_name);
 
                 analysis_data.get_data_ref<std::string>("file_name")->data.push_back(
                         image_name);
