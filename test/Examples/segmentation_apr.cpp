@@ -152,18 +152,18 @@ int main(int argc, char **argv) {
     proj_pars.theta_0 = -3.14;
     proj_pars.theta_final = 3.14;
     proj_pars.radius_factor = 1.1;
-    proj_pars.theta_delta = 0.025;
+    proj_pars.theta_delta = 0.015;
     proj_pars.scale_z = pc_struct.pars.aniso;
 
-    //APR<float> curr_apr(pc_struct);
+    APR<float> curr_apr(pc_struct);
 
-    //shift_particles_from_cells(curr_apr.part_new,seg_parts);
+    shift_particles_from_cells(curr_apr.part_new,seg_parts);
 
-    //ExtraPartCellData<uint16_t> seg_parts_depth = multiply_by_depth(seg_parts);
+    ExtraPartCellData<uint16_t> seg_parts_depth = multiply_by_depth(seg_parts);
 
     proj_pars.name = pc_struct.name + "depth";
 
-    //apr_perspective_raycast_depth(curr_apr.y_vec,seg_parts,seg_parts_depth,proj_pars,[] (const uint16_t& a,const uint16_t& b) {return std::max(a,b);},true);
+    apr_perspective_raycast_depth(curr_apr.y_vec,seg_parts,seg_parts_depth,proj_pars,[] (const uint16_t& a,const uint16_t& b) {return std::max(a,b);},true);
 
     ////////////////////////////////////
     //
@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
     //
     /////////////////////////////////////
 
-    bool connected_comp = true;
+    bool connected_comp = false;
 
     if(connected_comp) {
 
