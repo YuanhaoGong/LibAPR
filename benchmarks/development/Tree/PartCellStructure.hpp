@@ -1883,12 +1883,13 @@ public:
         int x_dim = ceil(org_dims[1]/2.0)*2;
         int z_dim = ceil(org_dims[2]/2.0)*2;
         
-        prev_k_img.mesh.resize(x_dim*z_dim*y_dim);
-        curr_k_img.mesh.resize(x_dim*z_dim*y_dim);
+        prev_k_img.initialize(y_dim,x_dim,z_dim);
+        curr_k_img.initialize(y_dim,x_dim,z_dim);
         
         interp_parts_to_pc(interp_data,curr_k_img,prev_k_img);
-        
-        std::swap(out_image,curr_k_img);
+
+        out_image.initialize(org_dims[0],org_dims[1],org_dims[2]);
+        out_image.block_copy_data(curr_k_img);
     
     }
     

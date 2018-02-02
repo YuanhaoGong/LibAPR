@@ -189,7 +189,7 @@ public:
     }
 
     template<typename T,typename U>
-    void transfer_intensities(APR<T>& apr,PartCellStructure<float,uint64_t>& pc_struct,ExtraPartCellData<U> extra_data){
+    void transfer_intensities(APR<T>& apr,PartCellStructure<float,uint64_t>& pc_struct,ExtraPartCellData<U>& extra_data){
 
         //initialize loop variables
         int x_;
@@ -271,7 +271,7 @@ public:
 
                                 //set the cooridnates info
                                 //get the intensity
-                                apr.particles_intensities.data[counter] = pc_struct.part_data.get_part(curr_key);
+                                apr.particles_intensities.data[counter] = extra_data.get_part(curr_key);
 
                                 counter++;
 

@@ -702,9 +702,9 @@ void const_upsample_img(MeshData<T>& input_us,MeshData<T>& input,std::vector<uns
     int x_size_max = ceil(max_dims[1]/2.0)*2;
     int z_size_max = ceil(max_dims[2]/2.0)*2;
 
-    const int z_num = std::min(input.z_num*2,z_size_max);
-    const int x_num = std::min(input.x_num*2,x_size_max);
-    const int y_num = std::min(input.y_num*2,y_size_max);
+    const int z_num = std::min((int)input.z_num*2,z_size_max);
+    const int x_num = std::min((int)input.x_num*2,x_size_max);
+    const int y_num = std::min((int)input.y_num*2,y_size_max);
 
     const int z_num_ds_l = z_num/2;
     const int x_num_ds_l = x_num/2;

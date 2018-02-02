@@ -19,7 +19,11 @@
 #include "src/numerics/APRRaycaster.hpp"
 #include "src/data_structures/APR/APR.hpp"
 
+
+#include "src/numerics/APRNumerics.hpp"
+
 #include "benchmarks/development/final_benchmarks/OldAPRConverter.hpp"
+
 
 bool command_option_exists(char **begin, char **end, const std::string &option)
 {
@@ -127,10 +131,10 @@ int main(int argc, char **argv) {
     timer.verbose_flag = true;
     timer.start_timer("full seg");
 
-    calc_graph_cuts_segmentation_new(pc_struct, seg_parts,analysis_data,parameters_new);
-
-    timer.stop_timer();
-
+//    calc_graph_cuts_segmentation_new(pc_struct, seg_parts,analysis_data,parameters_new);
+//
+//    timer.stop_timer();
+//
     ParticleDataNew<float, uint64_t> part_new;
     //flattens format to particle = cell, this is in the classic access/part paradigm
     part_new.initialize_from_structure(pc_struct);
@@ -144,9 +148,15 @@ int main(int argc, char **argv) {
 
     part_new.particle_data.org_dims = pc_struct.org_dims;
 
-    interp_img(seg_mesh, pc_data, part_new, seg_parts,true);
 
-    debug_write(seg_mesh,pc_struct.name + "_gc_seg");
+    MeshData<uint16_t> pc_mesh;
+    interp_img(pc_mesh, pc_data, part_new, part_new.particle_data,false);
+
+
+
+    //interp_img(pc_mesh,pc_struct.part_data.particle_data);
+    //interp_extrapc_to_mesh(pc_mesh,pc_struct,pc_struct.part_data.particle_data);
+
 
     APR<uint16_t> apr;
 
@@ -154,8 +164,20 @@ int main(int argc, char **argv) {
 
     old_apr.create_apr_from_pc_struct(apr,pc_struct);
 
-    old_apr.transfer_intensities(apr,pc_struct,seg_parts);
+    //old_apr.transfer_intensities(apr,pc_struct,pc_struct.part_data.particle_data);
 
+    apr.get_parts_from_img(pc_mesh,apr.particles_intensities);
+
+    APRNumerics apr_numerics;
+
+    ExtraParticleData<uint16_t> smooth_parts(apr);
+
+    std::vector<float> filter = {0.1,0.8,0.1};
+
+    apr_numerics.seperable_smooth_filter(apr,apr.particles_intensities,smooth_parts, filter,4);
+
+
+    std::swap(apr.particles_intensities.data,smooth_parts.data);
 
     MeshData<uint16_t> recon_pc;
 
@@ -167,7 +189,11 @@ int main(int argc, char **argv) {
     //write output as tiff
     TiffUtils::saveMeshAsTiff(options.directory + apr.name + "_pc.tif", recon_pc);
 
-    apr.write_apr(options.directory , apr.name +"_seg");
+    TiffUtils::saveMeshAsTiff(options.directory + apr.name + "_pc2.tif", pc_mesh);
+
+    apr.write_apr(options.directory , apr.name +"_seg_p");
+
+    apr.write_particles_only( options.directory , apr.name +"_seg",apr.particles_intensities);
 
 
 //    proj_par proj_pars;
