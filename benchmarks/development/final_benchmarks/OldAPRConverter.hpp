@@ -113,76 +113,76 @@ public:
         uint64_t counter = 0;
 
 
-        for(uint64_t i = pc_struct.pc_data.depth_min;i <= pc_struct.pc_data.depth_max;i++){
-
-            const unsigned int x_num_ = pc_struct.pc_data.x_num[i];
-            const unsigned int z_num_ = pc_struct.pc_data.z_num[i];
-
-            //For each depth there are two loops, one for SEED status particles, at depth + 1, and one for BOUNDARY and FILLER CELLS, to ensure contiguous memory access patterns.
-
-            // SEED PARTICLE STATUS LOOP (requires access to three data structures, particle access, particle data, and the part-map)
-//#pragma omp parallel for default(shared) private(z_,x_,j_,p,node_val_part,curr_key,part_offset,status) if(z_num_*x_num_ > 100)
-            for(z_ = 0;z_ < z_num_;z_++){
-
-                curr_key = 0;
-
-                pc_struct.part_data.access_data.pc_key_set_depth(curr_key,i);
-                pc_struct.part_data.access_data.pc_key_set_z(curr_key,z_);
-
-                for(x_ = 0;x_ < x_num_;x_++){
-
-                    pc_struct.part_data.access_data.pc_key_set_x(curr_key,x_);
-                    const size_t offset_pc_data = x_num_*z_ + x_;
-
-                    const size_t j_num = pc_struct.pc_data.data[i][offset_pc_data].size();
-
-                    y_coord = 0;
-
-                    for(j_ = 0;j_ < j_num;j_++){
-
-
-                        node_val_part = pc_struct.part_data.access_data.data[i][offset_pc_data][j_];
-
-                        if (!(node_val_part&1)){
-                            //get the index gap node
-                            y_coord++;
-
-                            pc_struct.part_data.access_data.pc_key_set_j(curr_key,j_);
-
-                            //neigh_keys.resize(0);
-                            status = pc_struct.part_data.access_node_get_status(node_val_part);
-                            part_offset = pc_struct.part_data.access_node_get_part_offset(node_val_part);
-
-                            pc_struct.part_data.access_data.pc_key_set_status(curr_key,status);
-
-
-
-
-                            //loop over the particles
-                            for(p = 0;p < pc_struct.part_data.get_num_parts(status);p++){
-                                pc_struct.part_data.access_data.pc_key_set_index(curr_key,part_offset+p);
-                                pc_struct.part_data.access_data.pc_key_set_partnum(curr_key,p);
-
-                                //set the cooridnates info
-                                //get the intensity
-                                apr.particles_intensities.data[counter] = pc_struct.part_data.get_part(curr_key);
-
-                                counter++;
-
-                            }
-
-                        } else {
-
-                            y_coord += ((node_val_part & COORD_DIFF_MASK_PARTICLE) >> COORD_DIFF_SHIFT_PARTICLE);
-                            y_coord--;
-                        }
-
-                    }
-
-                }
-
-            }
-        }
+//        for(uint64_t i = pc_struct.pc_data.depth_min;i <= pc_struct.pc_data.depth_max;i++){
+//
+//            const unsigned int x_num_ = pc_struct.pc_data.x_num[i];
+//            const unsigned int z_num_ = pc_struct.pc_data.z_num[i];
+//
+//            //For each depth there are two loops, one for SEED status particles, at depth + 1, and one for BOUNDARY and FILLER CELLS, to ensure contiguous memory access patterns.
+//
+//            // SEED PARTICLE STATUS LOOP (requires access to three data structures, particle access, particle data, and the part-map)
+////#pragma omp parallel for default(shared) private(z_,x_,j_,p,node_val_part,curr_key,part_offset,status) if(z_num_*x_num_ > 100)
+//            for(z_ = 0;z_ < z_num_;z_++){
+//
+//                curr_key = 0;
+//
+//                pc_struct.part_data.access_data.pc_key_set_depth(curr_key,i);
+//                pc_struct.part_data.access_data.pc_key_set_z(curr_key,z_);
+//
+//                for(x_ = 0;x_ < x_num_;x_++){
+//
+//                    pc_struct.part_data.access_data.pc_key_set_x(curr_key,x_);
+//                    const size_t offset_pc_data = x_num_*z_ + x_;
+//
+//                    const size_t j_num = pc_struct.pc_data.data[i][offset_pc_data].size();
+//
+//                    y_coord = 0;
+//
+//                    for(j_ = 0;j_ < j_num;j_++){
+//
+//
+//                        node_val_part = pc_struct.part_data.access_data.data[i][offset_pc_data][j_];
+//
+//                        if (!(node_val_part&1)){
+//                            //get the index gap node
+//                            y_coord++;
+//
+//                            pc_struct.part_data.access_data.pc_key_set_j(curr_key,j_);
+//
+//                            //neigh_keys.resize(0);
+//                            status = pc_struct.part_data.access_node_get_status(node_val_part);
+//                            part_offset = pc_struct.part_data.access_node_get_part_offset(node_val_part);
+//
+//                            pc_struct.part_data.access_data.pc_key_set_status(curr_key,status);
+//
+//
+//
+//
+//                            //loop over the particles
+//                            for(p = 0;p < pc_struct.part_data.get_num_parts(status);p++){
+//                                pc_struct.part_data.access_data.pc_key_set_index(curr_key,part_offset+p);
+//                                pc_struct.part_data.access_data.pc_key_set_partnum(curr_key,p);
+//
+//                                //set the cooridnates info
+//                                //get the intensity
+//                                apr.particles_intensities.data[counter] = pc_struct.part_data.get_part(curr_key);
+//
+//                                counter++;
+//
+//                            }
+//
+//                        } else {
+//
+//                            y_coord += ((node_val_part & COORD_DIFF_MASK_PARTICLE) >> COORD_DIFF_SHIFT_PARTICLE);
+//                            y_coord--;
+//                        }
+//
+//                    }
+//
+//                }
+//
+//            }
+//        }
 
 
 

@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
     timer.verbose_flag = true;
     timer.start_timer("full seg");
 
-    calc_graph_cuts_segmentation_new(pc_struct, seg_parts,analysis_data,parameters_new);
+   // calc_graph_cuts_segmentation_new(pc_struct, seg_parts,analysis_data,parameters_new);
 //
     timer.stop_timer();
 //
@@ -149,9 +149,16 @@ int main(int argc, char **argv) {
     MeshData<uint16_t> pc_mesh;
     interp_img(pc_mesh, pc_data, part_new, part_new.particle_data,false);
 
-    MeshData<uint16_t> seg_mesh;
-    interp_img(seg_mesh, pc_data, part_new, seg_parts,false);
+    std::string name = options.input;
+    //remove the file extension
+    name.erase(name.end()-17,name.end());
 
+    std::string input_name = options.directory + name + "_gc_seg.tif";
+
+    TiffUtils::TiffInfo inputTiff(input_name);
+    MeshData<uint16_t> seg_mesh = TiffUtils::getMesh<uint16_t>(inputTiff);
+
+   // interp_img(seg_mesh, pc_data, part_new, seg_parts,false);
 
     //interp_img(pc_mesh,pc_struct.part_data.particle_data);
     //interp_extrapc_to_mesh(pc_mesh,pc_struct,pc_struct.part_data.particle_data);
@@ -173,7 +180,7 @@ int main(int argc, char **argv) {
 
     std::vector<float> filter = {0.1,0.8,0.1};
 
-    apr_numerics.seperable_smooth_filter(apr,apr.particles_intensities,smooth_parts, filter,4);
+    apr_numerics.seperable_smooth_filter(apr,apr.particles_intensities,smooth_parts, filter,3);
 
 
     std::swap(apr.particles_intensities.data,smooth_parts.data);
@@ -185,18 +192,17 @@ int main(int argc, char **argv) {
     apr.interp_img(recon_pc, apr.particles_intensities);
     timer.stop_timer();
 
+    apr.name = name;
     //write output as tiff
-    TiffUtils::saveMeshAsTiff(options.directory + apr.name + "_pc.tif", recon_pc);
+    TiffUtils::saveMeshAsTiff(options.directory + name + "_pc.tif", recon_pc);
 
-    TiffUtils::saveMeshAsTiff(options.directory + apr.name + "_seg.tif", seg_mesh);
+    TiffUtils::saveMeshAsTiff(options.directory + name + "_seg.tif", seg_mesh);
 
-    apr.write_apr(options.directory , apr.name +"_intensities");
+    apr.write_apr(options.directory , name +"_intensities");
 
     apr.get_parts_from_img(seg_mesh,apr.particles_intensities);
 
-    apr.write_apr(options.directory , apr.name +"_segmentation");
-
-
+    apr.write_apr(options.directory , name +"_segmentation");
 
 
 //    proj_par proj_pars;
