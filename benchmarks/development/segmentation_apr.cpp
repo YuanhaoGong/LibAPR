@@ -114,11 +114,8 @@ int main(int argc, char **argv) {
     
     std::cout << "Num_parts: " << pc_struct.get_number_parts() << std::endl;
 
-    MeshData<uint16_t> seg_mesh;
 
     //calc_graph_cuts_segmentation_mesh(pc_struct,seg_mesh,parameters_nuc,analysis_data);
-    
-    std::cout << "Num_pixels: " <<seg_mesh.mesh.size() << std::endl;
     
     float Ip_threshold = pc_struct.pars.I_th;
     float Ip_max = 10000;
@@ -131,9 +128,9 @@ int main(int argc, char **argv) {
     timer.verbose_flag = true;
     timer.start_timer("full seg");
 
-//    calc_graph_cuts_segmentation_new(pc_struct, seg_parts,analysis_data,parameters_new);
+    calc_graph_cuts_segmentation_new(pc_struct, seg_parts,analysis_data,parameters_new);
 //
-//    timer.stop_timer();
+    timer.stop_timer();
 //
     ParticleDataNew<float, uint64_t> part_new;
     //flattens format to particle = cell, this is in the classic access/part paradigm
@@ -152,6 +149,8 @@ int main(int argc, char **argv) {
     MeshData<uint16_t> pc_mesh;
     interp_img(pc_mesh, pc_data, part_new, part_new.particle_data,false);
 
+    MeshData<uint16_t> seg_mesh;
+    interp_img(seg_mesh, pc_data, part_new, seg_parts,false);
 
 
     //interp_img(pc_mesh,pc_struct.part_data.particle_data);
@@ -189,11 +188,15 @@ int main(int argc, char **argv) {
     //write output as tiff
     TiffUtils::saveMeshAsTiff(options.directory + apr.name + "_pc.tif", recon_pc);
 
-    TiffUtils::saveMeshAsTiff(options.directory + apr.name + "_pc2.tif", pc_mesh);
+    TiffUtils::saveMeshAsTiff(options.directory + apr.name + "_seg.tif", seg_mesh);
 
-    apr.write_apr(options.directory , apr.name +"_seg_p");
+    apr.write_apr(options.directory , apr.name +"_intensities");
 
-    apr.write_particles_only( options.directory , apr.name +"_seg",apr.particles_intensities);
+    apr.get_parts_from_img(seg_mesh,apr.particles_intensities);
+
+    apr.write_apr(options.directory , apr.name +"_segmentation");
+
+
 
 
 //    proj_par proj_pars;
